@@ -20,7 +20,7 @@
     Since the dollar currency only contains 2 decimal points, float is not a precise way to represent it. I've change dollar currency into penny, which have integer amounts, at the beginning. In the end when I calculate average errors, I switch to dollar and round to 2 decimal points.
 2. Prepare the data structure
     dictionary: `pred_dict = {hour:{stock:price}}`;
-                `time_dict = {hour:[count, error_sum]}`;
+                `time_dict = {hour:(count, error_sum)}`;
     variable: `time_count`.
 3. Read and parse `predicted.txt`
     - Start with `predict.txt` since not all stock values have useful predicted information.

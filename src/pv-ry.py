@@ -31,7 +31,7 @@ def read_predict(pred_file):
     Returns:
         pred_dict: {hour:{stock:price}} A dictionary hold every stock and its
                     price for every hour appeared in the predicted file;
-        time_dict: {hour:[count, error_sum]} A dictionary hold list of the count
+        time_dict: {hour:[count, error_sum]} A dictionary hold tuple of the count
                     number for stock and the sum of price difference for every
                     hour appeared in the predicted file. The count numbers are
                      filled while the sum of price difference is still missing
@@ -40,7 +40,7 @@ def read_predict(pred_file):
     """
     # Initialize the dictionaries
     time_dict = {}
-    time_dict[0] = []
+    time_dict[0] = (0, 0)    # Set key as tuple
     pred_dict = {}
     pred_dict[0] = {}
 
@@ -53,14 +53,13 @@ def read_predict(pred_file):
         for line in f:
             hour, stock, price = parse_file(line)
             if hour not in pred_dict:
-                time_dict[time_count] = [count, 0]
+                time_dict[time_count] = (count, 0)
                 pred_dict[hour] = {}
-                time_dict[hour] = []
                 time_count = hour  # Set the current max hour
                 count = 0  # Reset the stock count in new hour
             pred_dict[hour][stock] = price
             count += 1  # Count
-        time_dict[time_count] = [count, 0]
+        time_dict[time_count] = (count, 0)
     return pred_dict, time_dict, time_count
 
 
@@ -74,23 +73,24 @@ def compare_actual(act_file, pred_dict, time_dict):
         act_file: (string) Input predicted file
         pred_dict: {hour:{stock:price}} A dictionary hold every stock and its
                     price for every hour appeared in the predicted file
-        time_dict: {hour:[count, error_sum]} A dictionary hold list of the count
+        time_dict: {hour:[count, error_sum]} A dictionary hold tuple of the count
                     number for stock and the sum of price difference for every
                     hour appeared in the predicted file. The count numbers are
                      filled while the sum of price difference is still missing
                      (set to 0).
     Returns:
-        time_dict: {hour:[count, error_sum]} A dictionary hold list of the count
+        time_dict: {hour:[count, error_sum]} A dictionary hold tuple of the count
                     number for stock and the sum of price difference for every
                     hour appeared in the predicted file.
     """
+
     with open(act_file) as f:
         for line in f:
             hour, stock, price = parse_file(line)
             # When find in dictionary, increase sum of error of given hour by actual-predict price difference
             if hour in pred_dict:
                 if stock in pred_dict[hour]:
-                    time_dict[hour][1] += abs(price - pred_dict[hour][stock])
+                    time_dict[hour] = (time_dict[hour][0], time_dict[hour][1] + abs(price - pred_dict[hour][stock]))
 
     return time_dict
 
@@ -102,7 +102,7 @@ def average_comparison(time_dict, window, time_count, comparison_file):
              adding the current ending hour;
             Calculate average error for every time window and write into file.
     Args:
-        time_dict: {hour:[count, error_sum]} A dictionary hold list of the count
+        time_dict: {hour:[count, error_sum]} A dictionary hold tuple of the count
                     number for stock and the sum of price difference for every
                     hour appeared in the predicted file;
         window: (int) Time window;
@@ -116,17 +116,17 @@ def average_comparison(time_dict, window, time_count, comparison_file):
         if time_count > window:
             # Initialize sum of error and count needed for the time window 0 to `window-1`
             for i in range(1, window):
-                sum_count_window += time_dict.get(i, [0, 0])[0]    # Use dictionary.get() in case hour not shown in predicted file
-                sum_error_window += time_dict.get(i)[1]
+                sum_count_window += time_dict.get(i, (0, 0))[0]    # Use dictionary.get() in case hour not shown in predicted file
+                sum_error_window += time_dict.get(i, (0, 0))[1]
             end_point = time_count - window + 2
             # Slide the time window by removing the previous starting hour and adding the current ending hour.
             for i in range(1, end_point):
                 old_hour = i - 1  # set pointer as the starting hour for previous window
-                sum_count_window -= time_dict.get(old_hour, [0, 0])[0]  # remove stock count for this pointer
-                sum_error_window -= time_dict.get(old_hour)[1]  # remove error sum for this pointer
+                sum_count_window -= time_dict.get(old_hour, (0, 0))[0]  # remove stock count for this pointer
+                sum_error_window -= time_dict.get(old_hour, (0, 0))[1]  # remove error sum for this pointer
                 new_hour = i + window - 1  # set pointer as the ending hour for current window
-                sum_count_window += time_dict.get(new_hour, [0, 0])[0]  # add stock count for this pointer
-                sum_error_window += time_dict.get(new_hour)[1]  # add new sum for this pointer
+                sum_count_window += time_dict.get(new_hour, (0, 0))[0]  # add stock count for this pointer
+                sum_error_window += time_dict.get(new_hour, (0, 0))[1]  # add new sum for this pointer
                 if sum_count_window > 0:
                     average_error = sum_error_window / sum_count_window / 100    # Change back to dollar
                     f.write("{}|{}|{:.2f}\n".format(i, new_hour, average_error))
