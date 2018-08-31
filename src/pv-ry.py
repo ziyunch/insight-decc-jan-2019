@@ -129,18 +129,18 @@ def average_comparison(time_dict, window, time_count, comparison_file):
                 sum_error_window += time_dict.get(new_hour)[1]  # add new sum for this pointer
                 if sum_count_window > 0:
                     average_error = sum_error_window / sum_count_window / 100    # Change back to dollar
-                else:
-                    average_error = 0
-                f.write("{}|{}|{:.2f}\n".format(i, new_hour, average_error))
+                    f.write("{}|{}|{:.2f}\n".format(i, new_hour, average_error))
+                else:    # No predicted stock price in given time window
+                    f.write("{}|{}|NA\n".format(i, new_hour))
         else:
-            if time_count > 0:
+            if time_count > 0:    # Predicted hour not enough for one window
                 end_point = time_count + 1
                 for i in range(1, end_point):
                     sum_error_window += time_dict[i][1]
                     sum_count_window += time_dict[i][0]
                 average_error = sum_error_window / sum_count_window / 100    # Change back to dollar
                 f.write("{}|{}|{:.2f}\n".format(1, window, average_error))
-            else:
+            else:    # No predicted stock price
                 f.write("{}|{}|NA\n".format(1, window))
 
 

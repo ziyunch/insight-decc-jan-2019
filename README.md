@@ -21,20 +21,20 @@
 2. Prepare the data structure
     dictionary: `pred_dict = {hour:{stock:price}}`;
                 `time_dict = {hour:[count, error_sum]}`;
-    variable: `time_count`
+    variable: `time_count`.
 3. Read and parse `predicted.txt`
-    Start with `predict.txt` since not all stock values have useful predicted information;
-    Read and parse `predict.txt` and prepare dictionary `pred_dict`;
-    Since all the predicted stock price were based on actual price for the same stock, I count the stocks for comparison in each hour when I prepare `pred_dict` and store in `time_dict`;
-    Maximum hour is also counted as `time_count`.
+    - Start with `predict.txt` since not all stock values have useful predicted information.
+    - Read and parse `predict.txt` and prepare dictionary `pred_dict`.
+    - Since all the predicted stock price were based on actual price for the same stock, I count the stocks for comparison in each hour when I prepare `pred_dict` and store in `time_dict`.
+    - Maximum hour is also counted as `time_count`.
 4. Compare with `actual.txt`
-    Read and parse `actual.txt`;
-    If find a stock at given hour in `pred_dict`, calculate the price difference between prediction and actual value and add it into `error_sum` to finish up building `time_dict`.
+    - Read and parse `actual.txt`.
+    - If find a stock at given hour in `pred_dict`, calculate the price difference between prediction and actual value and add it into `error_sum` to finish up building `time_dict`.
 5. Calculate average in time windows.
-    Start with time window from 0 to `window-1`. (e.g. `0 to 1`, when `window = 2`);
-    Slide the time window by removing the previous starting hour and adding the current ending hour;
-    Calculate average error for every time window and write into file;
-    Use `dictionary.get()` to find value from time_dict, in case we don't have good prediction of stock price in certain hours.
+    - Start with time window from 0 to `window-1`. (e.g. `0 to 1`, when `window = 2`).
+    - Slide the time window by removing the previous starting hour and adding the current ending hour.
+    - Calculate average error for every time window and write into file.
+    - Use `dictionary.get()` to find value from time_dict, in case we don't have good prediction of stock price in certain hours.
 
 ## Comment
-   Within 0.01 of the expected value
+   Test passed within 0.01 of the expected value
