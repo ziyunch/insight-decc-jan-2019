@@ -15,7 +15,7 @@
 ### Output Format
   - `comparison.txt`: time-ordered line-separated lists containing pipe-delimited `hour`, `hour+window`, `average error`.
 
-## Approach
+## Original approach (`pv-ry.py`)
 1. Dollar to penny
     Since the dollar currency only contains 2 decimal points, float is not a precise way to represent it. I've change dollar currency into penny, which have integer amounts, at the beginning. In the end when I calculate average errors, I switch to dollar and round to 2 decimal points.
 2. Prepare the data structure
@@ -37,4 +37,11 @@
     - Use `dictionary.get()` to find value from time_dict, in case we don't have good prediction of stock price in certain hours.
 
 ## Comment
-   Test passed within 0.01 of the expected value
+1. Test passed within 0.01 of the expected value;
+2. It is efficient to use dictionary as container datatype, but it may occupy to much memory when scale up.
+
+## Adapted approach (`pv-ry1.py`)
+1. Use `deque` from `collections` in Python's standard library. This is a list-like container with fast appends and pops on either end.
+2. Since the data are time-ordered, we could use `deque` as the container datatype when we compare `pred_dict` with `actual.txt` and build `time_deque` which save count and sum of error for every hour.
+3. When we slide the time window, we could also make a small `window_deque` to save the data we pop out from `time_deque` but might be useful for later time window.
+4. The time complexity of `deque.append()` and `deque.leftpop()` is O(1), thus we would retain (or even improve) the efficiency while reduce memory usage.
