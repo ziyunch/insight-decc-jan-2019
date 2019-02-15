@@ -1,5 +1,5 @@
-# Coding challenge
-  for Insight Data Engineering Program
+# Prediction Validation
+  A coding challenge for Insight Data Engineering Program
 
 ## Requirements
   Python 3.6.5
